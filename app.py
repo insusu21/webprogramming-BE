@@ -23,26 +23,26 @@ dest_col = db["destinations"]  # 여행지 정보를 위한 컬렉션
 review_col = db["reviews"]  # 리뷰 정보를 위한 컬렉션
 
 initial_destinations = [
-    {"name": "경복궁", "description": "한국의 대표적인 전통 궁궐", "type": "문화, 도시"},
-    {"name": "제주도", "description": "자연과 바다가 아름다운 섬", "type": "섬, 인기, 해변, 자연"},
-    {"name": "부산 해운대", "description": "한국에서 가장 유명한 해변 중 하나", "type": "인기, 해변"},
-    {"name": "남산타워", "description": "서울 전망을 볼 수 있는 타워", "type": "인기, 자연"},
-    {"name": "부산 광안리", "description": "야경이 멋진 부산의 해변", "type": "인기, 해변"},
-    {"name": "속초", "description": "동해와 산의 조화", "type": "인기, 도시, 해변"},
-    {"name": "강릉", "description": "바다와 커피 거리로 유명한 도시", "type": "인기, 도시"},
-    {"name": "경주", "description": "역사적인 유적이 많은 도시", "type": "인기, 도시"},
-    {"name": "전주한옥마을", "description": "전통과 현대가 공존하는 공간", "type": "인기, 문화"},
-    {"name": "담양", "description": "죽녹원으로 유명한 대나무숲", "type": "자연"},
-    {"name": "춘천 남이섬", "description": "데이트 명소로 유명한 섬", "type": "인기, 섬, 자연, 문화"},
-    {"name": "여수", "description": "밤바다와 케이블카로 유명", "type": "인기, 도시, 해변"},
-    {"name": "인사동", "description": "전통 공예와 갤러리의 거리", "type": "도시, 문화"},
-    {"name": "서촌", "description": "한적한 골목 문화거리", "type": "도시, 문화"},
-    {"name": "하동", "description": "녹차밭과 자연풍경", "type": "자연"},
-    {"name": "울릉도", "description": "자연이 살아있는 섬", "type": "섬, 자연"},
-    {"name": "대구 근대골목", "description": "역사 문화 체험 골목", "type": "도시, 문화"},
-    {"name": "통영", "description": "예쁜 바닷가 마을", "type": "해변"},
-    {"name": "포항 호미곶", "description": "해돋이 명소", "type": "해변"},
-    {"name": "양양 서피비치", "description": "서핑하기 좋은 해변", "type": "인기, 해변"}
+    {"name": "경복궁", "description": "한국의 대표적인 전통 궁궐", "type": "문화, 도시", "imageUrl": "https://search.pstatic.net/common/?src=http%3A%2F%2Fcafefiles.naver.net%2F20101110_89%2Fyoon1000510_12894008089823VwBE_jpg%2F11%252C10_%25B0%25E6%25C8%25B8%25B7%25E7-03_yoon1000510.jpg&type=a340"},
+    {"name": "제주도", "description": "자연과 바다가 아름다운 섬", "type": "섬, 인기, 해변, 자연" , "imageUrl": "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAxNzA2MDhfMTMx%2FMDAxNDk2ODg0MDk1Mjcw.nyRzE4I-fUjFntHS6CYUfn9GWq1NCxMa5NaZ_-CvEs8g.X1AGx19FIeR8SyeIlGQNjZo2sGQVCGJOo3GM99XbipIg.JPEG.shj7107%2F6.jpg&type=sc960_832"},
+    {"name": "부산 해운대", "description": "한국에서 가장 유명한 해변 중 하나", "type": "인기, 해변" , "imageUrl": "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyNDAyMTJfMjE5%2FMDAxNzA3NzQxOTczNDQ5.zb9jf4B-XOnKtFYx8LStzod2d3l8yjLsay6BVynMlWcg.T_ol8-E-VoO8a5IIdxCCeJibAmxRjiPT-O6IbitwSlAg.JPEG.bisr2da%2F1707741972438.jpg&type=sc960_832"},
+    {"name": "남산타워", "description": "서울 전망을 볼 수 있는 타워", "type": "인기, 자연" , "imageUrl": "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2F20150807_215%2Fchjfine_1438952708737R2XKj_JPEG%2F1438941154054.jpeg&type=sc960_832"},
+    {"name": "부산 광안리", "description": "야경이 멋진 부산의 해변", "type": "인기, 해변" , "imageUrl": "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyNTAyMDNfMjI3%2FMDAxNzM4NTYyNzE0MTEy.Yj_yobVbybOg4PCpwygjR1M6DcarMT1s3v-HOWONr6Ag._4o7j2-zGNdbOF9aCXcTQySBziNFbraSdVdIS4q-OEUg.JPEG%2F900%25A3%25DF20250203%25A3%25DF141900%25A3%25DF953.jpg&type=a340"},
+    {"name": "속초", "description": "동해와 산의 조화", "type": "인기, 도시, 해변" , "imageUrl": "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMzExMDZfODEg%2FMDAxNjk5MjcyMjU1ODAz.NehVTLdRDe78xfezPL4P2a4n133QPop6mEi_ebJVoNEg.xL0daf-j9XukQ4j0SZcIOXBLBccMBjqK0IAHNG2Exc8g.JPEG.cgnara%2F20231106%25A3%25DF182227.jpg&type=a340"},
+    {"name": "강릉", "description": "바다와 커피 거리로 유명한 도시", "type": "인기, 도시", "imageUrl": "https://search.pstatic.net/common/?src=http%3A%2F%2Fimgnews.naver.net%2Fimage%2F001%2F2023%2F05%2F02%2FPYH2023050211010006200_P4_20230502133914104.jpg&type=a340"},
+    {"name": "경주", "description": "역사적인 유적이 많은 도시", "type": "인기, 도시", "imageUrl": "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMzA4MTZfNzIg%2FMDAxNjkyMTQ3NjY1MjQ5.yRlPtHyRK0d78WqzgqDDMXtledrDmi3NoCpH1h5131kg.KbHmISUwef_XhqGjKox40NTNebzaqYLwYe-4Zp45_xcg.JPEG.rlwnghks1477%2FKakaoTalk_20230815_212029639_08.jpg&type=a340"},
+    {"name": "전주한옥마을", "description": "전통과 현대가 공존하는 공간", "type": "인기, 문화", "imageUrl": "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMjAxMTlfMjA0%2FMDAxNjQyNTc0MzM1NDY3.uerdQ1VIp1jumb-bCPt2ClX8Y9JXKVRxz5L3lLdhqeUg.byHow7psgNnW7aBNquo5GLIXSkaoSakn2etgpaTqiGog.JPEG.dasanpartner%2FKakaoTalk_20220119_152201377_01.jpg&type=sc960_832"},
+    {"name": "담양", "description": "죽녹원으로 유명한 대나무숲", "type": "자연", "imageUrl": "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMTA2MjhfNzgg%2FMDAxNjI0ODgxMjQyMzc1.aCJ2KG9sKp42leaUCN-GymJBzprWPW23NI-oLpQtOIog.i9Ar-PhZTrlmhR8M7nN5RfzZR71S2a0_0hPDNNN5u5og.JPEG.soock7010%2F1624881243558.jpg&type=sc960_832"},
+    {"name": "춘천 남이섬", "description": "데이트 명소로 유명한 섬", "type": "인기, 섬, 자연, 문화", "imageUrl": "https://search.pstatic.net/common/?src=http%3A%2F%2Fimgnews.naver.net%2Fimage%2F5486%2F2022%2F11%2F15%2F0000229999_004_20221115225804073.jpg&type=sc960_832"},
+    {"name": "여수", "description": "밤바다와 케이블카로 유명", "type": "인기, 도시, 해변", "imageUrl": "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMTA2MTVfMjI0%2FMDAxNjIzNzQzOTc3MTc2.OUqQt4L8VnRSwJfGyhXzO5sGsmvp5SSJPaDkzYMU3Bsg.VC6Kg05SAclK3JgWHy37tzs3i2FsvqdVVlKeEf3u_W4g.JPEG.vudod1%2F16236341582751.jpg&type=sc960_832"},
+    {"name": "인사동", "description": "전통 공예와 갤러리의 거리", "type": "도시, 문화", "imageUrl": "https://search.pstatic.net/sunny/?src=https%3A%2F%2Fmediahub.seoul.go.kr%2Fwp-content%2Fuploads%2Feditor%2Fimages%2F000559%2F%25EC%259D%25B8%25EC%2582%25AC%25EB%258F%2599_%25EA%25B3%25A8%25EB%25AA%25A9_DSC03586_1.jpg&type=sc960_832"},
+    {"name": "서촌", "description": "한적한 골목 문화거리", "type": "도시, 문화", "imageUrl": "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMjAzMzBfMjA2%2FMDAxNjQ4NjM3MTk0Njcx.zldaVDM5GVY-A01EaFkACE1DgkNgchF-Vzus9X70s-0g.7ht1c2yQtqv_Nikx-3bREKnn8ZaWxJLJ5Z-j5eWD7Vgg.JPEG.subunr7%2F000023.JPG&type=sc960_832"},
+    {"name": "하동", "description": "녹차밭과 자연풍경", "type": "자연", "imageUrl": "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMjA3MjlfNDQg%2FMDAxNjU5MDkxNDQ4NTky.34btOHsTEHGNRhjr4H8QM0Rtr7tODX1H8NGZaCKLBn0g.Ee8F0-IUVAf9y2rVJ2TxWsBSyl0i42-sScecOPsoazcg.JPEG.xodnaka1%2F10%252C4.jpg&type=sc960_832"},
+    {"name": "울릉도", "description": "자연이 살아있는 섬", "type": "섬, 자연", "imageUrl": "https://search.pstatic.net/common/?src=http%3A%2F%2Fcafefiles.naver.net%2F20160321_72%2Fbus2897_14585287711298z4Or_JPEG%2F20160321_112043.jpg&type=sc960_832"},
+    {"name": "대구 근대골목", "description": "역사 문화 체험 골목", "type": "도시, 문화", "imageUrl": "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMjAzMjNfMTk3%2FMDAxNjQ4MDMzNTEyNDU3.-gb4VCjP-oae34E_z88Dl7VNe7xzaxKLwrdgC-c11vQg.z0Fu6vtKjtsVkNtvQqvlcKHtbV8l0fZ8fX2kz1YhWg0g.JPEG.minstory98%2FKakaoTalk_20220323_190130141_22.jpg&type=sc960_832"},
+    {"name": "통영", "description": "예쁜 바닷가 마을", "type": "해변", "imageUrl": "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAxOTAzMDJfODQg%2FMDAxNTUxNDc4NTk5MDcy.h8dkj_Ipc0h7Y7C1CHZVXJmoA2grFlXnK9TKbfzG424g.YEYmrk8U2XcuQ9d0zyKMJzFi8yTyHlTvK95ZwpgVqo0g.JPEG.teramogi%2F15.jpg&type=sc960_832"},
+    {"name": "포항 호미곶", "description": "해돋이 명소", "type": "해변", "imageUrl": "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAxOTAxMjJfMjQg%2FMDAxNTQ4MDk5ODM0OTg5.m6aR7ojFobDYdTbc4kF2lBj2H9QWZ1vhEIm5JPYkqysg.n_TrtEJrjjaQb0jTgc1m4fg8rN892pljszHWZnHNlSgg.JPEG.kim60644%2F20190117_0032g.JPG&type=sc960_832"},
+    {"name": "양양 서피비치", "description": "서핑하기 좋은 해변", "type": "인기, 해변", "imageUrl": "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMTExMTBfMTg2%2FMDAxNjM2NTQ5OTE1OTM5.MqTw-N2X6bYDvvt7BEE7Yu61ABAdqILzIj1GGLPLK58g.Pn_RuzxiCGy1guyKyx83r2s_s2rnr6yHQK69ppkWf7gg.JPEG.ssoing_jh%2FKakaoTalk_20211110_220713569_05.jpg&type=sc960_832"}
 ]
 dest_col.delete_many({})  # 기존 데이터 제거 (원하면)
 dest_col.insert_many(initial_destinations)
