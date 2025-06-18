@@ -1,12 +1,42 @@
 from flask import Flask, request, jsonify
+from flask import session
 from pymongo import MongoClient
 import bcrypt
 from flask_cors import CORS
-
+from flask_login import LoginManager
+from flask_login import UserMixin
+from flask_login import login_user
 from flask_restx import Api, Resource
+from datetime import timedelta
 
 app = Flask(__name__)
-CORS(app)  # CORS 허용
+app.secret_key = 'ase123e2d2nn2l12n3'
+app.config['SESSION_PERMANENT'] = True
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=1)
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'
+app.config['SESSION_COOKIE_SECURE'] = True 
+CORS(app, supports_credentials=True, origins=["http://localhost:8080"])
+
+
+#세션
+login_manager = LoginManager()
+login_manager.init_app(app)
+@login_manager.user_loader
+def load_user(user_id):
+    # user_id로 DB에서 사용자 조회 후 User 객체 반환
+    user_data = user_col.find_one({"_id": ObjectId(user_id)})
+    if user_data:
+        return User(str(user_data['_id']), user_data['email'], user_data['name'])
+    return None
+
+class User(UserMixin):
+    def __init__(self, id, email, name):
+        self.id = id
+        self.email = email
+        self.name = name
+
+    def get_id(self):
+        return self.id
 
 # Swagger 설정
 api = Api(app, version='1.0', title='Travel API',
@@ -92,26 +122,37 @@ def login():
     data = request.json
     email = data.get('email')
     password = data.get('password')
-
-    # 필수 입력 확인
-    if not email or not password:
-        return jsonify({'message': '이메일과 비밀번호를 입력해주세요.'}), 400
-
-    # 사용자 조회
     user_data = user_col.find_one({"email": email})
-    if not user_data:
-        return jsonify({'message': '사용자를 찾을 수 없습니다.'}), 404
-
-    # 비밀번호 확인
-    if not bcrypt.checkpw(password.encode('utf-8'), user_data['password']):
-        return jsonify({'message': '비밀번호가 일치하지 않습니다.'}), 401
-
-    return jsonify({'message': '로그인 성공', 'user': {
-        "email": user_data['email'],
-        "name": user_data['name']
-    }}), 200
+    if user_data and bcrypt.checkpw(password.encode('utf-8'), user_data['password']):
+        user = User(str(user_data['_id']), user_data['email'], user_data['name'])
+        login_user(user)  # 세션에 로그인 정보 저장
+        session['user_id'] = str(user_data['_id'])
+        session.permanent = True
+        return jsonify({'message': '로그인 성공', 'user': {
+            "id": str(user_data['_id']),
+            "email": user_data['email'],
+            "name": user_data['name']
+        }}), 200
+    return jsonify({'message': '로그인 실패'}), 401
 
 from bson.objectid import ObjectId  # ObjectId를 사용하여 _id로 찾기
+
+#로그인 복원
+@app.route('/api/me', methods=['GET'])
+def get_current_user():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'message': '로그인 필요', 'logged_in': False}), 401
+    # DB에서 사용자 정보 조회
+    user_data = user_col.find_one({'_id': ObjectId(user_id)})
+    if not user_data:
+        return jsonify({'message': '사용자 없음', 'logged_in': False}), 401
+    return jsonify({
+        'id': str(user_data['_id']),
+        'email': user_data['email'],
+        'name': user_data['name'],
+        'logged_in': True
+    }), 200
 
 # 회원 정보 수정
 @app.route('/api/user/update', methods=['PUT'])
@@ -353,6 +394,18 @@ def delete_review(review_id):
 
     return jsonify({'message': '리뷰가 삭제되었습니다.'}), 200
 
+# 여행지별 리뷰 목록 조회 (쿼리 파라미터 방식 추가)
+@app.route('/api/reviews', methods=['GET'])
+def get_reviews():
+    dest_id = request.args.get('dest_id')
+    if dest_id:
+        reviews = list(review_col.find({"dest_id": ObjectId(dest_id)}))
+        for review in reviews:
+            review['_id'] = str(review['_id'])
+            review['user_id'] = str(review['user_id'])
+            review['dest_id'] = str(review['dest_id'])
+        return jsonify(reviews), 200
+    return jsonify({'message': 'dest_id 쿼리 파라미터가 필요합니다.'}), 400
 
 # 여행지별 리뷰 목록 조회
 @app.route('/api/reviews/destination/<string:dest_id>', methods=['GET'])
