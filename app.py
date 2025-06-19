@@ -432,6 +432,70 @@ def get_my_reviews():
 
     return jsonify(reviews), 200
 
+# ai api 관련
+import os
+import requests
+from flask import request, jsonify
+from dotenv import load_dotenv
+
+load_dotenv()
+
+@app.route('/api/ai_recommend', methods=['POST'])
+def ai_recommend():
+    try:
+        # 1. 사용자 데이터 수신
+        data = request.json
+        preferences = data.get('preferences')
+        
+        # 2. 여행지 데이터 조회
+        destinations = list(dest_col.find())
+        for d in destinations:
+            d['_id'] = str(d['_id'])
+        
+        # 3. 프롬프트 구성
+        prompt = f"""
+        [지침]
+        1. 다음 여행지 중 사용자 선호도에 가장 적합한 1개를 선택하세요
+        2. 반드시 JSON 형식으로 답변: {{"id": "여행지_id", "reason": "한 줄 이유"}}
+        3. 다른 텍스트는 포함하지 마세요
+
+        [사용자 선호도]
+        동반자: {preferences.get('companion')}
+        기간: {preferences.get('duration')}
+        관심사: {preferences.get('interest')}
+
+        [여행지 후보]
+        {json.dumps(destinations, ensure_ascii=False)}
+        """
+        
+        # 4. Gemini API 호출
+        api_key = os.getenv('GEMINI_API_KEY')
+        api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={api_key}"
+        payload = {"contents": [{"parts": [{"text": prompt}]}]}
+        
+        response = requests.post(api_url, json=payload, timeout=10)
+        response.raise_for_status()
+        gemini_response = response.json()
+        
+        # 5. 응답 파싱
+        text_response = gemini_response['candidates'][0]['content']['parts'][0]['text']
+        try:
+            # JSON 형식 응답 파싱
+            import json
+            result = json.loads(text_response)
+            return jsonify(result), 200
+        except json.JSONDecodeError:
+            # 텍스트에서 ID 추출 (폴백)
+            import re
+            id_match = re.search(r'"id"\s*:\s*"([a-f\d]{24})"', text_response)
+            if id_match:
+                return jsonify({"id": id_match.group(1)}), 200
+            raise ValueError("Invalid response format")
+            
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 
 
 
