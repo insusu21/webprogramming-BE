@@ -74,13 +74,13 @@ initial_destinations = [
     {"name": "포항 호미곶", "description": "해돋이 명소", "type": "해변", "imageUrl": "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAxOTAxMjJfMjQg%2FMDAxNTQ4MDk5ODM0OTg5.m6aR7ojFobDYdTbc4kF2lBj2H9QWZ1vhEIm5JPYkqysg.n_TrtEJrjjaQb0jTgc1m4fg8rN892pljszHWZnHNlSgg.JPEG.kim60644%2F20190117_0032g.JPG&type=sc960_832"},
     {"name": "양양 서피비치", "description": "서핑하기 좋은 해변", "type": "인기, 해변", "imageUrl": "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMTExMTBfMTg2%2FMDAxNjM2NTQ5OTE1OTM5.MqTw-N2X6bYDvvt7BEE7Yu61ABAdqILzIj1GGLPLK58g.Pn_RuzxiCGy1guyKyx83r2s_s2rnr6yHQK69ppkWf7gg.JPEG.ssoing_jh%2FKakaoTalk_20211110_220713569_05.jpg&type=sc960_832"}
 ]
-dest_col.delete_many({})  # 기존 데이터 제거 (원하면)
+
 dest_col.insert_many(initial_destinations)
 ############
 
 @app.route('/', methods=['POST']) # 홈페이지 방문
 def init_destinations():
-    dest_col.delete_many({})  # 기존 데이터 제거 (원하면)
+    
     dest_col.insert_many(initial_destinations)
     return jsonify({"message": "20개 여행지 초기화 완료"}), 201
 
@@ -154,44 +154,30 @@ def get_current_user():
         'logged_in': True
     }), 200
 
-# 회원 정보 수정
 @app.route('/api/user/update', methods=['PUT'])
 def update_user():
     data = request.json
-    user_id = data.get('user_id')  # 유저의 고유 _id
-    new_email = data.get('email')  # 이메일 수정 가능하도록 추가
-    new_password = data.get('password')
+    user_id = data.get('user_id')
     new_name = data.get('name')
     new_phone = data.get('phone')
 
     # 필수 입력 확인
-    if not all([user_id, new_password, new_name, new_phone]):
-        return jsonify({'message': '모든 필드를 입력해주세요.'}), 400
+    if not all([user_id, new_name, new_phone]):
+        return jsonify({'message': '필수 정보를 입력해주세요.'}), 400
 
-    # 사용자 조회 (_id로 찾기)
     user_data = user_col.find_one({"_id": ObjectId(user_id)})
     if not user_data:
         return jsonify({'message': '사용자를 찾을 수 없습니다.'}), 404
-    
-    # 중복 체크
-    if user_col.find_one({"email": new_email}):
-        return jsonify({'message': '이미 존재하는 이메일입니다.'}), 409
 
-    # 비밀번호 해싱
-    hashed_pw = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
-
-    # 업데이트할 데이터 (이메일도 수정 가능하게 추가)
     updated_data = {
-        "email": new_email,
-        "password": hashed_pw,
         "name": new_name,
         "phone": new_phone
     }
 
-    # 사용자 정보 업데이트
     user_col.update_one({"_id": ObjectId(user_id)}, {"$set": updated_data})
 
     return jsonify({'message': '회원정보가 수정되었습니다.'}), 200
+
 
 # 회원 탈퇴
 @app.route('/api/user/delete', methods=['DELETE'])
@@ -427,11 +413,12 @@ def get_reviews_by_dest(dest_id):
     return jsonify(reviews), 200
 
 # 유저가 작성한 리뷰 조회
-@app.route('/api/reviews/user/<string:user_id>', methods=['GET'])
-def get_reviews_by_user(user_id):
-    # 유저 ID로 리뷰들 조회
-    review_col = db["reviews"]
-    reviews = list(review_col.find({"user_id": ObjectId(user_id)}))  # 유저 ID로 필터링
+@app.route('/api/reviews/my', methods=['GET'])
+def get_my_reviews():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'message': '로그인 필요'}), 401
+    reviews = list(review_col.find({"user_id": ObjectId(user_id)}))
 
     # 리뷰가 없을 경우
     if not reviews:
