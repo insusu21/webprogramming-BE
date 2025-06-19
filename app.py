@@ -8,6 +8,9 @@ from flask_login import UserMixin
 from flask_login import login_user
 from flask_restx import Api, Resource
 from datetime import timedelta
+import os
+import requests
+import json  # 반드시 최상단에 추가!
 
 app = Flask(__name__)
 app.secret_key = 'ase123e2d2nn2l12n3'
@@ -75,14 +78,12 @@ initial_destinations = [
     {"name": "양양 서피비치", "description": "서핑하기 좋은 해변", "type": "인기, 해변", "imageUrl": "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyMTExMTBfMTg2%2FMDAxNjM2NTQ5OTE1OTM5.MqTw-N2X6bYDvvt7BEE7Yu61ABAdqILzIj1GGLPLK58g.Pn_RuzxiCGy1guyKyx83r2s_s2rnr6yHQK69ppkWf7gg.JPEG.ssoing_jh%2FKakaoTalk_20211110_220713569_05.jpg&type=sc960_832"}
 ]
 
-dest_col.insert_many(initial_destinations)
+if dest_col.count_documents({}) == 0:
+    dest_col.insert_many(initial_destinations)
+
 ############
 
-@app.route('/', methods=['POST']) # 홈페이지 방문
-def init_destinations():
-    
-    dest_col.insert_many(initial_destinations)
-    return jsonify({"message": "20개 여행지 초기화 완료"}), 201
+@app.route('/', methods=['POST'])
 
 
 ############################################################################### user관련 
@@ -137,6 +138,15 @@ def login():
 
 from bson.objectid import ObjectId  # ObjectId를 사용하여 _id로 찾기
 
+#로그아웃
+@app.route('/api/logout', methods=['POST'])
+def logout():
+    session.clear()  # Flask 세션 삭제
+    resp = jsonify({'message': '로그아웃 성공'})
+    resp.set_cookie('session', '', expires=0)  # 세션 쿠키 만료(필요시)
+    return resp, 200
+
+
 #로그인 복원
 @app.route('/api/me', methods=['GET'])
 def get_current_user():
@@ -181,13 +191,13 @@ def update_user():
 
 # 회원 탈퇴
 @app.route('/api/user/delete', methods=['DELETE'])
-def delete_user():
-    data = request.json
-    user_id = data.get('user_id')  # 탈퇴하려는 사용자의 _id
 
-    # 필수 입력 확인
+def delete_user():
+    user_id = session.get('user_id')  # 세션에서 user_id 가져오기
+
     if not user_id:
-        return jsonify({'message': '사용자의 고유 ID를 입력해주세요.'}), 400
+        return jsonify({'message': '로그인 정보가 없습니다.'}), 401
+
 
     # 사용자 조회 (_id로 찾기)
     user_data = user_col.find_one({"_id": ObjectId(user_id)})
@@ -204,24 +214,33 @@ def delete_user():
 
 ################################################################################# 여행지 관련
 
-# 여행지 추가
 @app.route('/api/destinations/create', methods=['POST'])
 def create_destination():
     data = request.json
-    name = data.get('name')           # 여행지 이름
-    description = data.get('description')  # 여행지 설명
+    name = data.get('name')
+    description = data.get('description')
+    type = data.get('type')          # 추가
+    imageUrl = data.get('imageUrl')   # 추가
 
-    # 필수 입력 확인
-    if not name or not description:
-        return jsonify({'message': '여행지 이름과 설명을 입력해주세요.'}), 400
+    # 필수 필드 검증 (모두 추가)
+    if not name or not description or not type or not imageUrl:
+        return jsonify({'message': '모든 항목을 입력해주세요.'}), 400
 
-    # 여행지 정보 DB 저장
+    # 중복 체크
+    if dest_col.find_one({"name": name}):
+        return jsonify({'message': '이미 존재하는 여행지입니다.'}), 409
+
+    # DB에 모든 필드 저장
     dest_col.insert_one({
         "name": name,
-        "description": description
+        "description": description,
+        "type": type,                # 추가
+        "imageUrl": imageUrl          # 추가
     })
 
     return jsonify({'message': '여행지 정보가 추가되었습니다.'}), 201
+
+
 
 # 여행지 정보 수정
 @app.route('/api/destinations/update/<string:dest_id>', methods=['PUT'])
@@ -351,6 +370,21 @@ def update_review(review_id):
 
     return jsonify({'message': '리뷰가 수정되었습니다.'}), 200
 
+# 리뷰 전체 조회 API
+@app.route('/api/reviews/all', methods=['GET'])
+def get_all_reviews():
+    reviews = list(review_col.find({}))
+    for review in reviews:
+        # ObjectId를 문자열로 변환
+        review['_id'] = str(review['_id'])
+        if 'user_id' in review:
+            review['user_id'] = str(review['user_id'])
+        if 'dest_id' in review:
+            review['dest_id'] = str(review['dest_id'])
+    return jsonify(reviews), 200
+
+
+
 # 특정 리뷰 상세 조회
 @app.route('/api/reviews/<string:review_id>', methods=['GET'])
 def get_review_by_id(review_id):
@@ -433,9 +467,6 @@ def get_my_reviews():
     return jsonify(reviews), 200
 
 # ai api 관련
-import os
-import requests
-from flask import request, jsonify
 
 
 @app.route('/api/ai_recommend', methods=['POST'])
@@ -467,8 +498,8 @@ def ai_recommend():
         """
         
         # 4. Gemini API 호출
-        api_key = "YOUR_ACTUAL_API_KEY"
-        gemini_api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={api_key}"
+        
+        api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyDKuH_rGXFwlGZLqUAH1VrRRQELY8ayeOc"
 
         payload = {"contents": [{"parts": [{"text": prompt}]}]}
         
@@ -480,7 +511,6 @@ def ai_recommend():
         text_response = gemini_response['candidates'][0]['content']['parts'][0]['text']
         try:
             # JSON 형식 응답 파싱
-            import json
             result = json.loads(text_response)
             return jsonify(result), 200
         except json.JSONDecodeError:
