@@ -436,9 +436,7 @@ def get_my_reviews():
 import os
 import requests
 from flask import request, jsonify
-from dotenv import load_dotenv
 
-load_dotenv()
 
 @app.route('/api/ai_recommend', methods=['POST'])
 def ai_recommend():
@@ -469,8 +467,9 @@ def ai_recommend():
         """
         
         # 4. Gemini API 호출
-        api_key = os.getenv('GEMINI_API_KEY')
-        api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={api_key}"
+        api_key = "YOUR_ACTUAL_API_KEY"
+        gemini_api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={api_key}"
+
         payload = {"contents": [{"parts": [{"text": prompt}]}]}
         
         response = requests.post(api_url, json=payload, timeout=10)
