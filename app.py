@@ -499,7 +499,7 @@ def ai_recommend():
         
         # 4. Gemini API 호출
         
-        api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyDKuH_rGXFwlGZLqUAH1VrRRQELY8ayeOc"
+        api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key= your key"
 
         payload = {"contents": [{"parts": [{"text": prompt}]}]}
         
